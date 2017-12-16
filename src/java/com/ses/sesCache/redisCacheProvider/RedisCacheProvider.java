@@ -1,6 +1,7 @@
 package com.ses.sesCache.redisCacheProvider;
 
 import com.ses.sesCache.CacheProvider;
+import com.ses.util.serialization.SerializationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
@@ -34,6 +35,19 @@ public class RedisCacheProvider implements CacheProvider {
      * jedis.close();//使用之后记得关闭连接
      */
     private JedisPool pool;
+
+    /**
+     * 序列化工具
+     */
+    private SerializationUtil serializationUtil;
+
+    public SerializationUtil getSerializationUtil() {
+        return serializationUtil;
+    }
+
+    public void setSerializationUtil(SerializationUtil serializationUtil) {
+        this.serializationUtil = serializationUtil;
+    }
 
     public JedisPool getPool() {
         return pool;
