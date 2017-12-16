@@ -23,14 +23,7 @@ public final class ProtostuffSerializationUtil implements SerializationUtil {
         cachedSchemas = new ConcurrentHashMap<Class<?>, Schema<?>>();
         objenesis = new ObjenesisStd(true);
     }
-
-    /**
-     * 提供私有构造器，防止该类被继承
-     */
-    private ProtostuffSerializationUtil() {
-
-    }
-
+    
     /**
      * 将对象<code>message</code>序列化为字节数组
      *

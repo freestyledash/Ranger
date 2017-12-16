@@ -91,12 +91,13 @@ public class RedisCacheProvider implements CacheProvider {
     /**
      * 设置缓存的对象
      *
-     * @param key               键(改建用户自行定义)
-     * @param serializationDate 序列化之后的值
+     * @param key     键(改建用户自行定义)
+     * @param toStore 存储对象
      * @return 是否设置成功
      */
     @Override
-    public boolean set(String key, byte[] serializationDate) {
+    public boolean set(String key, Object toStore) {
+        byte[] serializationDate = serializationUtil.serialize(toStore);
         String s = null;
         try {
             s = new String(serializationDate, characterEncoding);

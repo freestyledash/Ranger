@@ -36,11 +36,11 @@ public interface CacheProvider {
     /**
      * 设置缓存的对象
      *
-     * @param key               键
-     * @param serializationDate 序列化之后的值
+     * @param key     键
+     * @param toStore 需要存储的对象
      * @return 是否设置成功
      */
-    boolean set(String key, byte[] serializationDate);
+    boolean set(String key, Object toStore);
 
 
     /**
