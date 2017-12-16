@@ -24,14 +24,14 @@ public interface CacheProvider {
 
 
     /**
-     * 从缓存容器中批量获得缓存对象
+     * 从缓存容器中批量获得缓存对象，对象类型只能是同一种
      *
      * @param keys  缓存的键
      * @param clazz 缓存对象的类型
      * @param <T>   缓存的类型
      * @return 被缓存的对象
      */
-    <T> T get(List<String> keys, Class<T> clazz);
+    <T> List<T> get(List<String> keys, Class<T> clazz);
 
     /**
      * 设置缓存的对象

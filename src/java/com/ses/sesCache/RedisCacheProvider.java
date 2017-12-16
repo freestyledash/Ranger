@@ -8,10 +8,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 使用redis实现的cache提供者
@@ -78,7 +75,7 @@ public class RedisCacheProvider implements CacheProvider {
     }
 
     /**
-     * 从缓存容器中批量获得缓存对象
+     * 从缓存容器中批量获得缓存对象,对象类型只能是同一种
      * 使用pipeline
      *
      * @param keys  缓存的键
@@ -86,8 +83,30 @@ public class RedisCacheProvider implements CacheProvider {
      * @return 被缓存的对象
      */
     @Override
-    public <T> T get(List<String> keys, Class<T> clazz) {
-        return null;
+    public <T> List<T> get(List<String> keys, Class<T> clazz) {
+        if (keys.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List returnList = new ArrayList<T>(20);
+        Jedis resource = pool.getResource();
+        Pipeline pipelined = resource.pipelined();
+        Iterator<String> iterator = keys.iterator();
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            pipelined.get(next);
+        }
+        List<Object> objects = pipelined.syncAndReturnAll();
+        Iterator<Object> returnObjects = objects.iterator();
+        while (returnObjects.hasNext()) {
+            Object next = returnObjects.next();
+            try {
+                returnList.add(serializationUtil.deserialize(((String) next).getBytes(characterEncoding), clazz));
+            } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage());
+                return new ArrayList<>();
+            }
+        }
+        return returnList;
     }
 
     /**
@@ -144,6 +163,7 @@ public class RedisCacheProvider implements CacheProvider {
             pipelined.set(key, s);
         }
         pipelined.sync();
+        resource.close();
         return true;
     }
 
@@ -154,7 +174,18 @@ public class RedisCacheProvider implements CacheProvider {
      */
     @Override
     public void delete(List<String> keys) {
-
+        if (keys.isEmpty()) {
+            return;
+        }
+        Jedis resource = pool.getResource();
+        Pipeline pipelined = resource.pipelined();
+        Iterator<String> iterator = keys.iterator();
+        while (iterator.hasNext()) {
+            String next = iterator.next();
+            pipelined.del(next);
+        }
+        pipelined.sync();
+        resource.close();
     }
 
     /**
