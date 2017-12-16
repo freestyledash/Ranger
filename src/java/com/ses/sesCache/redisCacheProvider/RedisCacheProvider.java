@@ -4,8 +4,10 @@ import com.ses.sesCache.CacheProvider;
 import com.ses.util.serialization.SerializationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -41,36 +43,41 @@ public class RedisCacheProvider implements CacheProvider {
      */
     private SerializationUtil serializationUtil;
 
-    public SerializationUtil getSerializationUtil() {
-        return serializationUtil;
-    }
+    /**
+     * 在redis中无法存储byte，可以存储string类型的数据，在使用缓存相关方法前，需要确定使用什么字符串编码的方式,默认使用UTF-8
+     */
+    private String characterEncoding = "UTF-8";
 
-    public void setSerializationUtil(SerializationUtil serializationUtil) {
-        this.serializationUtil = serializationUtil;
-    }
-
-    public JedisPool getPool() {
-        return pool;
-    }
-
-    public void setPool(JedisPool pool) {
-        this.pool = pool;
-    }
 
     /**
      * 从缓存容器中获得单个缓存对象
      *
      * @param key   缓存的键
      * @param clazz 缓存对象的类型
-     * @return 被缓存的对象
+     * @return 被缓存的对象 如果为null则未命中
      */
     @Override
     public <T> T get(String key, Class<T> clazz) {
-        return null;
+        Jedis resource = pool.getResource();
+        String s = resource.get(key);
+        if (s.isEmpty()) {
+            logger.info("查询缓存{},未命中", key);
+            return null;
+        }
+        byte[] bytes = null;
+        try {
+            bytes = s.getBytes(characterEncoding);
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage());
+            return null;
+        }
+        logger.info("查询缓存{},命中", key);
+        return serializationUtil.deserialize(bytes, clazz);
     }
 
     /**
      * 从缓存容器中批量获得缓存对象
+     * 使用pipeline
      *
      * @param keys  缓存的键
      * @param clazz 缓存对象的类型
@@ -84,13 +91,23 @@ public class RedisCacheProvider implements CacheProvider {
     /**
      * 设置缓存的对象
      *
-     * @param key               键
+     * @param key               键(改建用户自行定义)
      * @param serializationDate 序列化之后的值
      * @return 是否设置成功
      */
     @Override
     public boolean set(String key, byte[] serializationDate) {
-        return false;
+        String s = null;
+        try {
+            s = new String(serializationDate, characterEncoding);
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage());
+            return false;
+        }
+        Jedis resource = pool.getResource();
+        resource.set(key, s);
+        logger.info("设置缓存{}", key);
+        return true;
     }
 
     /**
@@ -121,6 +138,33 @@ public class RedisCacheProvider implements CacheProvider {
      */
     @Override
     public void delete(String key) {
+        logger.info("删除缓存{}", key);
+        Jedis resource = pool.getResource();
+        resource.del(key);
+    }
 
+
+    public String getCharacterEncoding() {
+        return characterEncoding;
+    }
+
+    public void setCharacterEncoding(String characterEncoding) {
+        this.characterEncoding = characterEncoding;
+    }
+
+    public SerializationUtil getSerializationUtil() {
+        return serializationUtil;
+    }
+
+    public void setSerializationUtil(SerializationUtil serializationUtil) {
+        this.serializationUtil = serializationUtil;
+    }
+
+    public JedisPool getPool() {
+        return pool;
+    }
+
+    public void setPool(JedisPool pool) {
+        this.pool = pool;
     }
 }
