@@ -1,15 +1,17 @@
-package com.ses.sesCache.redisCacheProvider;
+package com.ses.sesCache;
 
-import com.ses.sesCache.CacheProvider;
 import com.ses.util.serialization.SerializationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Pipeline;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 使用redis实现的cache提供者
@@ -114,13 +116,35 @@ public class RedisCacheProvider implements CacheProvider {
 
     /**
      * 批量设置缓存的对象
+     * 使用pipeline
      *
      * @param params
      * @return 是否设置成功
      */
     @Override
-    public boolean set(Map<String, byte[]> params) {
-        return false;
+    public boolean set(Map<String, Object> params) {
+        if (params.size() < 1) {
+            return true;
+        }
+        Jedis resource = pool.getResource();
+        Pipeline pipelined = resource.pipelined();
+        Set<Map.Entry<String, Object>> entries = params.entrySet();
+        Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Object> next = iterator.next();
+            String key = next.getKey();
+            Object value = next.getValue();
+            String s = null;
+            try {
+                s = new String(serializationUtil.serialize(value), characterEncoding);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                return false;
+            }
+            pipelined.set(key, s);
+        }
+        pipelined.sync();
+        return true;
     }
 
     /**

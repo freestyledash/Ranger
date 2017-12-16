@@ -48,7 +48,7 @@ public interface CacheProvider {
      *
      * @return 是否设置成功
      */
-    boolean set(Map<String, byte[]> params);
+    boolean set(Map<String, Object> params);
 
 
     /**
