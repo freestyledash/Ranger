@@ -108,6 +108,7 @@ public class RedisCacheProvider implements CacheProvider {
         Jedis resource = pool.getResource();
         resource.set(key, s);
         logger.info("设置缓存{}", key);
+        resource.close();
         return true;
     }
 
@@ -142,6 +143,7 @@ public class RedisCacheProvider implements CacheProvider {
         logger.info("删除缓存{}", key);
         Jedis resource = pool.getResource();
         resource.del(key);
+        resource.close();
     }
 
 
