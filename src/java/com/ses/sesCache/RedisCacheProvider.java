@@ -18,6 +18,18 @@ import java.util.*;
  */
 public class RedisCacheProvider implements CacheProvider {
 
+
+    public RedisCacheProvider(JedisPool pool, SerializationUtil util) {
+        this.pool = pool;
+        this.serializationUtil = util;
+    }
+
+    public RedisCacheProvider(JedisPool pool, SerializationUtil util, String characterEncoding) {
+        this.pool = pool;
+        this.serializationUtil = util;
+        this.characterEncoding = characterEncoding;
+    }
+
     private static Logger logger = LoggerFactory.getLogger(RedisCacheProvider.class);
 
     /**
@@ -112,12 +124,13 @@ public class RedisCacheProvider implements CacheProvider {
     /**
      * 设置缓存的对象
      *
-     * @param key     键(改建用户自行定义)
-     * @param toStore 存储对象
+     * @param key     键
+     * @param toStore 需要存储的对象
+     * @param ttl     过期时间 -1 永不过期 单位是秒
      * @return 是否设置成功
      */
     @Override
-    public boolean set(String key, Object toStore) {
+    public boolean set(String key, Object toStore, int ttl) {
         byte[] serializationDate = serializationUtil.serialize(toStore);
         String s = null;
         try {
@@ -128,6 +141,11 @@ public class RedisCacheProvider implements CacheProvider {
         }
         Jedis resource = pool.getResource();
         resource.set(key, s);
+        if (ttl == -1) {
+            //do nothing
+        } else {
+            resource.expire(key, ttl);
+        }
         logger.info("设置缓存{}", key);
         resource.close();
         return true;
@@ -224,5 +242,37 @@ public class RedisCacheProvider implements CacheProvider {
 
     public void setPool(JedisPool pool) {
         this.pool = pool;
+    }
+
+    /**
+     * builder模式来构造缓存提供者
+     * 目前用处不不大
+     */
+    public static class RedisCacheProviderBuilder {
+
+        private JedisPool pool;
+
+        private SerializationUtil serializationUtil;
+
+        private String characterEncoding = "UTF-8";
+
+        public RedisCacheProviderBuilder setPool(JedisPool pool) {
+            this.pool = pool;
+            return this;
+        }
+
+        public RedisCacheProviderBuilder setSerializationUtil(SerializationUtil util) {
+            this.serializationUtil = util;
+            return this;
+        }
+
+        public RedisCacheProviderBuilder setCharacterEncoding(String encoding) {
+            this.characterEncoding = encoding;
+            return this;
+        }
+
+        public RedisCacheProvider build() {
+            return new RedisCacheProvider(pool, serializationUtil, characterEncoding);
+        }
     }
 }

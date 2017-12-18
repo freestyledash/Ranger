@@ -38,9 +38,10 @@ public interface CacheProvider {
      *
      * @param key     键
      * @param toStore 需要存储的对象
+     * @param ttl     过期时间 -1 永不过期 ，单位是秒
      * @return 是否设置成功
      */
-    boolean set(String key, Object toStore);
+    boolean set(String key, Object toStore, int ttl);
 
 
     /**

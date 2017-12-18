@@ -13,9 +13,7 @@
         ProtostuffSerializationUtil util = new ProtostuffSerializationUtil();
 
         //init provider，combine pool and uitl
-        RedisCacheProvider provider = new RedisCacheProvider();
-        provider.setPool(pool);
-        provider.setSerializationUtil(util);
+        RedisCacheProvider provider = new RedisCacheProvider(pool,util);
 ```
 ## provider对象提供以下方法:
 ```$xslt
