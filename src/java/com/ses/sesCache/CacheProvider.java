@@ -20,7 +20,7 @@ public interface CacheProvider {
      * @param <T>   缓存的类型
      * @return 被缓存的对象
      */
-    <T> T get(String key, Class<T> clazz);
+    <T> T getCache(String key, Class<T> clazz);
 
 
     /**
@@ -31,7 +31,7 @@ public interface CacheProvider {
      * @param <T>   缓存的类型
      * @return 被缓存的对象
      */
-    <T> List<T> get(List<String> keys, Class<T> clazz);
+    <T> List<T> getCache(List<String> keys, Class<T> clazz);
 
     /**
      * 设置缓存的对象
@@ -41,7 +41,7 @@ public interface CacheProvider {
      * @param ttl     过期时间 -1 永不过期 ，单位是秒
      * @return 是否设置成功
      */
-    boolean set(String key, Object toStore, int ttl);
+    boolean setCache(String key, Object toStore, int ttl);
 
 
     /**
@@ -49,7 +49,7 @@ public interface CacheProvider {
      *
      * @return 是否设置成功
      */
-    boolean set(Map<String, Object> params);
+    boolean setCache(Map<String, Object> params, int ttl);
 
 
     /**
@@ -57,7 +57,7 @@ public interface CacheProvider {
      *
      * @param keys 键集合
      */
-    void delete(List<String> keys);
+    void deleteCache(List<String> keys);
 
 
     /**
@@ -65,7 +65,7 @@ public interface CacheProvider {
      *
      * @param key 单个键
      */
-    void delete(String key);
+    void deleteCache(String key);
 
 
 }

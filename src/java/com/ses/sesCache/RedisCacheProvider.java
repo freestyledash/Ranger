@@ -24,12 +24,6 @@ public class RedisCacheProvider implements CacheProvider {
         this.serializationUtil = util;
     }
 
-    public RedisCacheProvider(JedisPool pool, SerializationUtil util, String characterEncoding) {
-        this.pool = pool;
-        this.serializationUtil = util;
-        this.characterEncoding = characterEncoding;
-    }
-
     private static Logger logger = LoggerFactory.getLogger(RedisCacheProvider.class);
 
     /**
@@ -55,10 +49,9 @@ public class RedisCacheProvider implements CacheProvider {
     private SerializationUtil serializationUtil;
 
     /**
-     * 在redis中无法存储byte，可以存储string类型的数据，在使用缓存相关方法前，需要确定使用什么字符串编码的方式,默认使用UTF-8
+     * 在redis中无法存储byte，可以存储string类型的数据，在使用缓存相关方法前，需要确定使用什么字符串编码的方式,默认使用iso8859-1
      */
-    private String characterEncoding = "UTF-8";
-
+    private static final String characterEncoding = "iso8859-1";
 
     /**
      * 从缓存容器中获得单个缓存对象
@@ -68,7 +61,7 @@ public class RedisCacheProvider implements CacheProvider {
      * @return 被缓存的对象 如果为null则未命中
      */
     @Override
-    public <T> T get(String key, Class<T> clazz) {
+    public <T> T getCache(String key, Class<T> clazz) {
         Jedis resource = pool.getResource();
         String s = resource.get(key);
         if (s.isEmpty()) {
@@ -95,7 +88,7 @@ public class RedisCacheProvider implements CacheProvider {
      * @return 被缓存的对象
      */
     @Override
-    public <T> List<T> get(List<String> keys, Class<T> clazz) {
+    public <T> List<T> getCache(List<String> keys, Class<T> clazz) {
         if (keys.isEmpty()) {
             return new ArrayList<>();
         }
@@ -130,7 +123,7 @@ public class RedisCacheProvider implements CacheProvider {
      * @return 是否设置成功
      */
     @Override
-    public boolean set(String key, Object toStore, int ttl) {
+    public boolean setCache(String key, Object toStore, int ttl) {
         byte[] serializationDate = serializationUtil.serialize(toStore);
         String s = null;
         try {
@@ -141,9 +134,7 @@ public class RedisCacheProvider implements CacheProvider {
         }
         Jedis resource = pool.getResource();
         resource.set(key, s);
-        if (ttl == -1) {
-            //do nothing
-        } else {
+        if (ttl != -1) {
             resource.expire(key, ttl);
         }
         logger.info("设置缓存{}", key);
@@ -156,10 +147,11 @@ public class RedisCacheProvider implements CacheProvider {
      * 使用pipeline
      *
      * @param params
+     * @param ttl
      * @return 是否设置成功
      */
     @Override
-    public boolean set(Map<String, Object> params) {
+    public boolean setCache(Map<String, Object> params, int ttl) {
         if (params.size() < 1) {
             return true;
         }
@@ -179,6 +171,9 @@ public class RedisCacheProvider implements CacheProvider {
                 return false;
             }
             pipelined.set(key, s);
+            if (ttl != -1) {
+                pipelined.expire(key, ttl);
+            }
         }
         pipelined.sync();
         resource.close();
@@ -191,7 +186,7 @@ public class RedisCacheProvider implements CacheProvider {
      * @param keys 键集合
      */
     @Override
-    public void delete(List<String> keys) {
+    public void deleteCache(List<String> keys) {
         if (keys.isEmpty()) {
             return;
         }
@@ -212,21 +207,13 @@ public class RedisCacheProvider implements CacheProvider {
      * @param key 单个键
      */
     @Override
-    public void delete(String key) {
+    public void deleteCache(String key) {
         logger.info("删除缓存{}", key);
         Jedis resource = pool.getResource();
         resource.del(key);
         resource.close();
     }
 
-
-    public String getCharacterEncoding() {
-        return characterEncoding;
-    }
-
-    public void setCharacterEncoding(String characterEncoding) {
-        this.characterEncoding = characterEncoding;
-    }
 
     public SerializationUtil getSerializationUtil() {
         return serializationUtil;
@@ -248,31 +235,27 @@ public class RedisCacheProvider implements CacheProvider {
      * builder模式来构造缓存提供者
      * 目前用处不不大
      */
-    public static class RedisCacheProviderBuilder {
+    public static class Builder {
 
         private JedisPool pool;
 
         private SerializationUtil serializationUtil;
 
-        private String characterEncoding = "UTF-8";
-
-        public RedisCacheProviderBuilder setPool(JedisPool pool) {
+        public Builder setPool(JedisPool pool) {
             this.pool = pool;
             return this;
         }
 
-        public RedisCacheProviderBuilder setSerializationUtil(SerializationUtil util) {
+        public Builder setSerializationUtil(SerializationUtil util) {
             this.serializationUtil = util;
             return this;
         }
 
-        public RedisCacheProviderBuilder setCharacterEncoding(String encoding) {
-            this.characterEncoding = encoding;
-            return this;
-        }
-
         public RedisCacheProvider build() {
-            return new RedisCacheProvider(pool, serializationUtil, characterEncoding);
+            if (pool == null || serializationUtil == null) {
+                throw new IllegalStateException("pool和serializationUtil未初始化");
+            }
+            return new RedisCacheProvider(pool, serializationUtil);
         }
     }
 }
