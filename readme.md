@@ -2,7 +2,7 @@
 
 ## 使用方式:
 1.创建provider对象，改对象推荐设置为全局对象，可以使用容器组装provider对象，比如spring框架
-```$xslt
+```
         //init jdies pool
         JedisPoolConfig config = new JedisPoolConfig();
         config.setMaxTotal(100);//最大连接数
@@ -15,8 +15,16 @@
         //init provider，combine pool and uitl
         RedisCacheProvider provider = new RedisCacheProvider(pool,util);
 ```
-## provider对象提供以下方法:
-```$xslt
+或者
+```
+    //使用链式表达式创建对象
+    new  RedisCacheProvider.Builder().setPool(pool).setSerializationUtil(util).build()
+
+```
+
+
+2 provider对象提供以下方法:
+```
     /**
      * 从缓存容器中获得单个缓存对象
      *
@@ -25,7 +33,7 @@
      * @param <T>   缓存的类型
      * @return 被缓存的对象
      */
-    <T> T get(String key, Class<T> clazz);
+    <T> T getCache(String key, Class<T> clazz);
 
 
     /**
@@ -36,16 +44,17 @@
      * @param <T>   缓存的类型
      * @return 被缓存的对象
      */
-    <T> List<T> get(List<String> keys, Class<T> clazz);
+    <T> List<T> getCache(List<String> keys, Class<T> clazz);
 
     /**
      * 设置缓存的对象
      *
      * @param key     键
      * @param toStore 需要存储的对象
+     * @param ttl     过期时间 -1 永不过期 ，单位是秒
      * @return 是否设置成功
      */
-    boolean set(String key, Object toStore);
+    boolean setCache(String key, Object toStore, int ttl);
 
 
     /**
@@ -53,7 +62,7 @@
      *
      * @return 是否设置成功
      */
-    boolean set(Map<String, Object> params);
+    boolean setCache(Map<String, Object> params, int ttl);
 
 
     /**
@@ -61,7 +70,7 @@
      *
      * @param keys 键集合
      */
-    void delete(List<String> keys);
+    void deleteCache(List<String> keys);
 
 
     /**
@@ -69,6 +78,6 @@
      *
      * @param key 单个键
      */
-    void delete(String key);
+    void deleteCache(String key);
 
 ```
