@@ -10,8 +10,12 @@ import org.objenesis.ObjenesisStd;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 /**
  * protustuff工具实现序列化功能
+ *
+ * @author zhangyanqi
+ * @since 1.0 2017/12/16
  */
 public final class ProtostuffSerializationUtil implements SerializationUtil {
 
@@ -23,7 +27,7 @@ public final class ProtostuffSerializationUtil implements SerializationUtil {
         cachedSchemas = new ConcurrentHashMap<Class<?>, Schema<?>>();
         objenesis = new ObjenesisStd(true);
     }
-    
+
     /**
      * 将对象<code>message</code>序列化为字节数组
      *

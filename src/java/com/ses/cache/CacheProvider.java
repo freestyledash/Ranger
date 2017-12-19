@@ -1,4 +1,4 @@
-package com.ses.sesCache;
+package com.ses.cache;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +47,8 @@ public interface CacheProvider {
     /**
      * 批量设置缓存的对象
      *
+     * @param params 需要设置的对象
+     * @param ttl 对象存活时间
      * @return 是否设置成功
      */
     boolean setCache(Map<String, Object> params, int ttl);

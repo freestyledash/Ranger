@@ -9,13 +9,15 @@ package com.ses.util.serialization;
 public interface SerializationUtil {
 
     /**
+     * 序列化
+     *
      * @param toSerialize 将要被序列化的对象
      * @return 序列化之后的数组
      */
     byte[] serialize(Object toSerialize);
 
     /**
-     * 序列化
+     * 返序列化
      *
      * @param data  被反序列化的数组
      * @param clazz 目标类型对象
