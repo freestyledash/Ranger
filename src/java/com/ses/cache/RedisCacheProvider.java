@@ -1,4 +1,4 @@
-package com.ses.sesCache;
+package com.ses.cache;
 
 import com.ses.util.serialization.SerializationUtil;
 import org.slf4j.Logger;
