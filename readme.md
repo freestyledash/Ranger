@@ -1,4 +1,5 @@
-# SESCache
+# Ranger
+轻量级缓存中间件，目前支持redis作为缓存介质来储存数据
 
 ## 使用方式:
 1.创建provider对象，改对象推荐设置为全局对象，可以使用容器组装provider对象，比如spring框架
@@ -21,7 +22,6 @@
     new  RedisCacheProvider.Builder().setPool(pool).setSerializationUtil(util).build()
 
 ```
-
 
 2 provider对象提供以下方法:
 ```

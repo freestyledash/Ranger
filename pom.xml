@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ses</groupId>
-    <artifactId>SESCache</artifactId>
+    <groupId>com.freestyledash</groupId>
+    <artifactId>Ranger</artifactId>
     <version>1.0</version>
 
 
@@ -116,23 +116,22 @@
 
     <distributionManagement>
         <repository>
-            <id>SES Releases</id>
-            <name>SES Releases</name>
-            <url>http://120.25.163.13:10001/nexus/content/repositories/ses-releases</url>
+            <id>freestyledash Releases</id>
+            <name>Releases</name>
+            <url>http://60.205.221.44:8081/repository/maven-releases/</url>
         </repository>
-        <snapshotRepository>
-            <id>SES Snapshots</id>
-            <name>SES Snapshots</name>
-            <url>http://120.25.163.13:10001/nexus/content/repositories/ses-snapshots</url>
-        </snapshotRepository>
 
+        <snapshotRepository>
+            <id>freestyledash Snapshots</id>
+            <name>Snapshots</name>
+            <url>http://60.205.221.44:8081/repository/maven-snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <repositories>
         <repository>
-            <id>SES Repositories</id>
-            <name>SES Repositories</name>
-            <url>http://120.25.163.13:10001/nexus/content/groups/ses/</url>
+            <id>maven_group</id>
+            <url>http://60.205.221.44:8081/repository/maven_group/</url>
             <releases>
                 <enabled>true</enabled>
             </releases>

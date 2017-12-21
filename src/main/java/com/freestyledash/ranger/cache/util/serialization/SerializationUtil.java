@@ -1,4 +1,4 @@
-package com.ses.util.serialization;
+package com.freestyledash.ranger.cache.util.serialization;
 
 /**
  * 序列化工具的接口

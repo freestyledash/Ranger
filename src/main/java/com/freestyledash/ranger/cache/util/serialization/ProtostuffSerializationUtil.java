@@ -1,4 +1,4 @@
-package com.ses.util.serialization;
+package com.freestyledash.ranger.cache.util.serialization;
 
 import io.protostuff.GraphIOUtil;
 import io.protostuff.LinkedBuffer;

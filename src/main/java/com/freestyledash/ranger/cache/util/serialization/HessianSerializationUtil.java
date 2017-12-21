@@ -1,11 +1,10 @@
-package com.ses.util.serialization;
+package com.freestyledash.ranger.cache.util.serialization;
 
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 /**

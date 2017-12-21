@@ -1,6 +1,6 @@
-package com.ses.cache;
+package com.freestyledash.ranger.cache;
 
-import com.ses.util.serialization.SerializationUtil;
+import com.freestyledash.ranger.cache.util.serialization.SerializationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
