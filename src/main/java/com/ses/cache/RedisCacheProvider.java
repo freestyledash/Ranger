@@ -51,7 +51,7 @@ public class RedisCacheProvider implements CacheProvider {
     /**
      * 在redis中无法存储byte，可以存储string类型的数据，在使用缓存相关方法前，需要确定使用什么字符串编码的方式,默认使用iso8859-1
      */
-    private static final String characterEncoding = "iso8859-1";
+    private static final String CHARACTERENCODING = "iso8859-1";
 
     /**
      * 从缓存容器中获得单个缓存对象
@@ -70,7 +70,7 @@ public class RedisCacheProvider implements CacheProvider {
         }
         byte[] bytes = null;
         try {
-            bytes = s.getBytes(characterEncoding);
+            bytes = s.getBytes(CHARACTERENCODING);
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage());
             return null;
@@ -105,7 +105,7 @@ public class RedisCacheProvider implements CacheProvider {
         while (returnObjects.hasNext()) {
             Object next = returnObjects.next();
             try {
-                returnList.add(serializationUtil.deserialize(((String) next).getBytes(characterEncoding), clazz));
+                returnList.add(serializationUtil.deserialize(((String) next).getBytes(CHARACTERENCODING), clazz));
             } catch (UnsupportedEncodingException e) {
                 logger.error(e.getMessage());
                 return new ArrayList<>();
@@ -127,7 +127,7 @@ public class RedisCacheProvider implements CacheProvider {
         byte[] serializationDate = serializationUtil.serialize(toStore);
         String s = null;
         try {
-            s = new String(serializationDate, characterEncoding);
+            s = new String(serializationDate, CHARACTERENCODING);
         } catch (UnsupportedEncodingException e) {
             logger.error(e.getMessage());
             return false;
@@ -165,7 +165,7 @@ public class RedisCacheProvider implements CacheProvider {
             Object value = next.getValue();
             String s = null;
             try {
-                s = new String(serializationUtil.serialize(value), characterEncoding);
+                s = new String(serializationUtil.serialize(value), CHARACTERENCODING);
             } catch (Exception e) {
                 logger.error(e.getMessage());
                 return false;

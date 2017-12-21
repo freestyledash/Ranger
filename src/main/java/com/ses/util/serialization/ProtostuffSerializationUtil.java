@@ -34,13 +34,15 @@ public final class ProtostuffSerializationUtil implements SerializationUtil {
      * @param message 要序列化的对象
      * @return 序列化后的字节数组
      */
+    @Override
     @SuppressWarnings("unchecked")
     public byte[] serialize(Object message) {
-        Class clazz = message.getClass();
+        Wrapper wrapper = new Wrapper(message);
+        Class clazz = wrapper.getClass();
         LinkedBuffer buffer = LinkedBuffer.allocate();
         try {
             Schema schema = getSchema(clazz);
-            return GraphIOUtil.toByteArray(message, schema, buffer);
+            return GraphIOUtil.toByteArray(wrapper, schema, buffer);
         } finally {
             buffer.clear();
         }
@@ -54,11 +56,12 @@ public final class ProtostuffSerializationUtil implements SerializationUtil {
      * @param <T>   对象的类型参数
      * @return 反序列化后的对象
      */
+    @Override
     public <T> T deserialize(byte[] data, Class<T> clazz) {
-        T message = objenesis.newInstance(clazz);
-        Schema<T> schema = getSchema(clazz);
+        Wrapper message = objenesis.newInstance(Wrapper.class);
+        Schema<Wrapper> schema = getSchema(Wrapper.class);
         GraphIOUtil.mergeFrom(data, message, schema);
-        return message;
+        return (T) message.realObject;
     }
 
     @SuppressWarnings("unchecked")
@@ -69,6 +72,25 @@ public final class ProtostuffSerializationUtil implements SerializationUtil {
             cachedSchemas.put(clazz, schema);
         }
         return schema;
+    }
+
+
+    /**
+     * 为了解决一些类无法被正确的序列化，但是作为一个类的属性就可以正确的序列化，于是将所有的类都装进warpper中
+     * 改wrapper对象对外界不可见
+     *
+     * @param <T> 对象类型
+     */
+    private static class Wrapper<T> {
+
+        /**
+         * 用户存储的对象
+         */
+        public T realObject;
+
+        public Wrapper(T realObject) {
+            this.realObject = realObject;
+        }
     }
 
 }
