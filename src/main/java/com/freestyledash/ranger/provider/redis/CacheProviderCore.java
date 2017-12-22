@@ -1,6 +1,7 @@
-package com.freestyledash.ranger.cache;
+package com.freestyledash.ranger.provider.redis;
 
-import com.freestyledash.ranger.cache.util.serialization.SerializationUtil;
+import com.freestyledash.ranger.provider.CacheProvider;
+import com.freestyledash.ranger.util.serialization.SerializationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
@@ -11,20 +12,21 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
- * 使用redis实现的cache提供者
+ * 使用redis实现的cache提供者核心类
+ * 不能直接使用，因为并没有提供方式缓存雪崩的功能
  *
  * @author zhangyanqi
  * @since 1.0 2017/12/16
  */
-public class RedisCacheProvider implements CacheProvider {
+class CacheProviderCore implements CacheProvider {
 
 
-    public RedisCacheProvider(JedisPool pool, SerializationUtil util) {
+    public CacheProviderCore(JedisPool pool, SerializationUtil util) {
         this.pool = pool;
         this.serializationUtil = util;
     }
 
-    private static Logger logger = LoggerFactory.getLogger(RedisCacheProvider.class);
+    private static Logger logger = LoggerFactory.getLogger(CacheProviderCore.class);
 
     /**
      * redis连接池，在运行时依赖注入
@@ -251,11 +253,11 @@ public class RedisCacheProvider implements CacheProvider {
             return this;
         }
 
-        public RedisCacheProvider build() {
+        public CacheProviderCore build() {
             if (pool == null || serializationUtil == null) {
                 throw new IllegalStateException("pool和serializationUtil未初始化");
             }
-            return new RedisCacheProvider(pool, serializationUtil);
+            return new CacheProviderCore(pool, serializationUtil);
         }
     }
 }

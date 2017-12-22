@@ -1,4 +1,4 @@
-package com.freestyledash.ranger.cache;
+package com.freestyledash.ranger.provider;
 
 import java.util.List;
 import java.util.Map;

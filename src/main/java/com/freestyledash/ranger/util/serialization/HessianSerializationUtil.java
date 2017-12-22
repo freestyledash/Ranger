@@ -1,4 +1,4 @@
-package com.freestyledash.ranger.cache.util.serialization;
+package com.freestyledash.ranger.util.serialization;
 
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;

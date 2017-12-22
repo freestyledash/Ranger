@@ -13,13 +13,16 @@
         //init serializationUtil
         ProtostuffSerializationUtil util = new ProtostuffSerializationUtil();
 
-        //init provider，combine pool and uitl
-        RedisCacheProvider provider = new RedisCacheProvider(pool,util);
+        //init providerFactory，combine pool and uitl
+        CacheProviderFactory c = new CacheProviderFactory(pool, util);
+        
+        //getProvider
+        CacheProvider provider = c.getProvider();
 ```
 或者
 ```
     //使用链式表达式创建对象
-    new  RedisCacheProvider.Builder().setPool(pool).setSerializationUtil(util).build()
+    new CacheProviderFactory.Builder().setLock(null).setPool(null).setSerializationUtil().build().getProvider()
 
 ```
 
