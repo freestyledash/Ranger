@@ -78,6 +78,7 @@ class CacheProviderCore implements CacheProvider {
             return null;
         }
         logger.info("查询缓存{},命中", key);
+        resource.close();
         return serializationUtil.deserialize(bytes, clazz);
     }
 
