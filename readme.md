@@ -2,7 +2,7 @@
 轻量级缓存中间件，目前支持redis作为缓存介质来储存数据
 
 ## 使用方式:
-1.创建provider对象，改对象推荐设置为全局对象，可以使用容器组装provider对象，比如spring框架
+1.创建provider对象，改对象推荐设置为全局对象，推荐使用IOC容器组装provider对象
 ```
         //init jdies pool
         JedisPoolConfig config = new JedisPoolConfig();
@@ -19,11 +19,9 @@
         //getProvider
         CacheProvider provider = c.getProvider();
 ```
-或者
+或者使用链式表达式创建对象
 ```
-    //使用链式表达式创建对象
     new CacheProviderFactory.Builder().setLock(null).setPool(null).setSerializationUtil().build().getProvider()
-
 ```
 
 2 provider对象提供以下方法:
@@ -84,3 +82,11 @@
     void deleteCache(String key);
 
 ```
+3 缓存在项目中的使用
+设计目标是让开发者在service层中进行自定义的调用(cache aside)
+
+4 缓存设计思想
+通过读写锁防止缓存雪崩,但是可能在一些写操作过多的场景下会出现性能差的情况
+
+
+

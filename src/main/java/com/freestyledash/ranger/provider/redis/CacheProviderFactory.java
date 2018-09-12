@@ -54,7 +54,6 @@ public class CacheProviderFactory {
                     @Override
                     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                         Object result = null;
-//                        return method.invoke(cacheProviderCore,args);
                         //读取操作上读锁，写入操作上写锁
                         //如果是Object的方法，放行
                         if (Object.class.equals(method.getDeclaringClass())) {
